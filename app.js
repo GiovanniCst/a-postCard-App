@@ -1,48 +1,67 @@
-//associa alle variabili i moduli richiesti dall' applicazione
-//sarà una applicazione basata su express, quindi integriamo express;
-var express = require('express');
-var path = require('path');
-var cloudinary = require('cloudinary');
+var http = require('http');
 var fs = require('fs');
+var formidable = require('formidable');
+var util = require('util');
 
-cloudinary.config({
-  cloud_name: 'postcards',
-  api_key: '367379836234655',
-  api_secret: 'ZGoPPWEG8OMoZOomJ6crjitBfzk'
+var server = http.createServer(function (req, res) {
+    if (req.method.toLowerCase() == 'get' ) {
+        displayForm(res);
+    } else if (req.method.toLowerCase() == 'post') {
+        //processAllFieldsOfTheForm(req, res);
+        processFormFieldsIndividual(req, res);
+    }
+
 });
 
+function displayForm(res) {
+    fs.readFile('form.html', function(err, data){
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Content-Length': data.length
+        });
+        res.write(data);
+        res.end();
+    })
+}
 
+function processAllFieldsOfTheForm(req, res) {
+    var form = new formidable.IncomingForm();
 
-cloudinary.uploader.upload("test_image.jpg", function(result) {
-  console.log(result)
+    form.parse(req, function (err, fields, files) {
+        res.writeHead(200, {
+            'content-type' : 'text/plain'
+        });
+        res.write('received the data: \n\n');
+        res.end(util.inspect({
+            fields : fields,
+            files : files
+        }));
+    });
+}
+
+function processFormFieldsIndividual(req, res) {
+    var fields = [];
+    var form = new formidable.IncomingForm();
+    form.on('field', function (field, value) {
+        console.log(field);
+        console.log(value);
+        fields[field] = value;
+    });
+
+    form.on('end', function () {
+        res.writeHead(200, {
+            'content-type' : 'text-plain'
+        });
+        res.write('received the data: \n\n');
+        res.end(util.inspect({
+            fields : fields,
+    }));
 });
+form.parse(req);
+}
 
-//creo una variabile app che rapre la nuova applicazione express. In questo
-//modo app otterrà i metodi di express
-var app = express();
-
-app.use(express.static(path.join(__dirname, 'public')));
-var routes = require('./routes');
+///https://www.sitepoint.com/creating-and-handling-forms-in-node-js/
 
 
-//si è precendentemente installato ejs come template engine
-//(npm install ejs --save) e ora è necessario impostarlo anche come view
-//engine per evitare errori
-app.set('view engine', 'ejs');
-
-//Seguono, le rotte - la logica viene definita in ./routes/index.js - vedi
-
-//home
-app.get('/', routes.home);
-//pagine inesistenti
-app.get('*', routes.notFound);
-
-app.post('/upload', function(req, res){
-  var imageStream = fs.createReadStream(req.files.image.path, { encoding: 'binary' })
-    , cloudStream = cloudinary.uploader.upload_stream(function() { res.redirect('/'); });
-
-  imageStream.on('data', cloudStream.write).on('end', cloudStream.end);
-});
-
-//crea il server web
-app.listen(process.env.PORT || 3000);
+server.listen(1185);
+console.log("server now listening on port 1185");
