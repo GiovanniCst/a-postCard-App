@@ -3,11 +3,14 @@
 
 'use strict';
 
+//Richiede i moduli
 var http = require('http');
 var fs = require('fs');
 var formidable = require('formidable');
 var util = require('util');
 
+
+//Definisce la funzione "Processa i campi individualmente"
 function processFormFieldsIndividual(req, res) {
     var fields = [];
     var form = new formidable.IncomingForm();
@@ -29,6 +32,23 @@ function processFormFieldsIndividual(req, res) {
     form.parse(req);
 }
 
+////Definisce la funzione "Processa tutti i campi"
+function processAllFieldsOfTheForm(req, res) {
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function (err, fields, files) {
+        res.writeHead(200, {
+            'content-type' : 'text/plain'
+        });
+        res.write('received the data: \n\n');
+        res.end(util.inspect({
+            fields : fields,
+            files : files
+        }));
+    });
+}
+
+//Definisce la funzione "mostra il form"
 function displayForm(res) {
     fs.readFile('form.html', function (err, data) {
         res.writeHead(200, {
@@ -53,20 +73,6 @@ var server = http.createServer(function (req, res) {
 
 
 
-function processAllFieldsOfTheForm(req, res) {
-    var form = new formidable.IncomingForm();
-
-    form.parse(req, function (err, fields, files) {
-        res.writeHead(200, {
-            'content-type' : 'text/plain'
-        });
-        res.write('received the data: \n\n');
-        res.end(util.inspect({
-            fields : fields,
-            files : files
-        }));
-    });
-}
 
 ///https://www.sitepoint.com/creating-and-handling-forms-in-node-js/
 
