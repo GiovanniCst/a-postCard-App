@@ -1,3 +1,5 @@
+'use strict';
+
 var http = require('http');
 var fs = require('fs');
 var formidable = require('formidable');
@@ -21,7 +23,7 @@ function displayForm(res) {
         });
         res.write(data);
         res.end();
-    })
+    });
 }
 
 function processAllFieldsOfTheForm(req, res) {
