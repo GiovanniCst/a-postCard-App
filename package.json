@@ -17,14 +17,9 @@
   },
   "homepage": "https://github.com/GiovanniCst/a-postCard-App#readme",
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "cloudinary": "^1.4.6",
-    "ejs": "^2.5.5",
     "express": "^4.14.0",
     "formidable": "^1.0.17",
     "fs": "0.0.1-security",
     "http": "0.0.0",
-    "logger": "0.0.1",
-    "njs": "0.0.2"
   }
 }
