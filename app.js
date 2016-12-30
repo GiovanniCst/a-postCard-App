@@ -1,45 +1,12 @@
+/*jslint node:true*/
+/*global console */
+
 'use strict';
 
 var http = require('http');
 var fs = require('fs');
 var formidable = require('formidable');
 var util = require('util');
-
-var server = http.createServer(function (req, res) {
-    if (req.method.toLowerCase() == 'get' ) {
-        displayForm(res);
-    } else if (req.method.toLowerCase() == 'post') {
-        //processAllFieldsOfTheForm(req, res);
-        processFormFieldsIndividual(req, res);
-    }
-
-});
-
-function displayForm(res) {
-    fs.readFile('form.html', function(err, data){
-        res.writeHead(200, {
-            'Content-Type': 'text/html',
-            'Content-Length': data.length
-        });
-        res.write(data);
-        res.end();
-    });
-}
-
-function processAllFieldsOfTheForm(req, res) {
-    var form = new formidable.IncomingForm();
-
-    form.parse(req, function (err, fields, files) {
-        res.writeHead(200, {
-            'content-type' : 'text/plain'
-        });
-        res.write('received the data: \n\n');
-        res.end(util.inspect({
-            fields : fields,
-            files : files
-        }));
-    });
-}
 
 function processFormFieldsIndividual(req, res) {
     var fields = [];
@@ -56,10 +23,49 @@ function processFormFieldsIndividual(req, res) {
         });
         res.write('received the data: \n\n');
         res.end(util.inspect({
-            fields : fields,
-    }));
+            fields : fields
+        }));
+    });
+    form.parse(req);
+}
+
+function displayForm(res) {
+    fs.readFile('form.html', function (err, data) {
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Content-Length': data.length
+        });
+        res.write(data);
+        res.end();
+    });
+}
+
+
+var server = http.createServer(function (req, res) {
+    if (req.method.toLowerCase() === 'get') {
+        displayForm(res);
+    } else if (req.method.toLowerCase() === 'post') {
+        //processAllFieldsOfTheForm(req, res);
+        processFormFieldsIndividual(req, res);
+    }
+
 });
-form.parse(req);
+
+
+
+function processAllFieldsOfTheForm(req, res) {
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function (err, fields, files) {
+        res.writeHead(200, {
+            'content-type' : 'text/plain'
+        });
+        res.write('received the data: \n\n');
+        res.end(util.inspect({
+            fields : fields,
+            files : files
+        }));
+    });
 }
 
 ///https://www.sitepoint.com/creating-and-handling-forms-in-node-js/
