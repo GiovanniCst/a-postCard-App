@@ -20,6 +20,21 @@ function processFormFieldsIndividual(req, res) {
         fields[field] = value;
     });
 
+form.on('file', function(name, file) {
+    console.log(name);
+    console.log(file);
+    fields[name] = file;
+});
+
+form.on('progress', function(bytesReceived, bytesExpected){
+    var progress = {
+        type: 'progress',
+        bytesReceived: bytesReceived,
+        bytesExpected : bytesExpected
+    }
+    console.log(progress);
+});
+
     form.on('end', function () {
         res.writeHead(200, {
             'content-type' : 'text-plain'
