@@ -14,6 +14,9 @@ var util = require('util');
 function processFormFieldsIndividual(req, res) {
     var fields = [];
     var form = new formidable.IncomingForm();
+    form.uploadDir = "/pCardApp/upload";
+    form.encoding = 'utf-8';
+    form.keepExtensions = true;
     form.on('field', function (field, value) {
         console.log(field);
         console.log(value);
